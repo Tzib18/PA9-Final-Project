@@ -2,6 +2,7 @@
 #include "SFML/System.hpp"
 #include "SFML/Audio.hpp"
 #include "SFML/Window.hpp"
+// end goal worked i was able to start it on the pc and then transfer it to my laptop
 int main(void)
 {										// x, y 
 	sf::RenderWindow windows(sf::VideoMode(800, 800), "Test run of using sfml", sf::Style::Titlebar | sf::Style::Close); // this sets up the window screen 
