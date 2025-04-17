@@ -9,7 +9,7 @@
 int main(void)
 {										// x, y 
 // Create the game window
-    sf::RenderWindow window(sf::VideoMode(800, 600), "Doodle Jump - Mason Edition");
+    sf::RenderWindow window(sf::VideoMode(800, 800), "Doodle Jump -  PA9");
     // Keeps a steady frame rate
     window.setFramerateLimit(60);
 

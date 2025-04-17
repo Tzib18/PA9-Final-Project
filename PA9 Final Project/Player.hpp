@@ -35,7 +35,7 @@ private:
     sf::Texture mTexture;      // Image texture of the doodle character
     float mVelocityY;          // Vertical speed (gravity or jump)
 
-    const float mGravity = 0.35f;      // Constant downward force
-    const float mJumpSpeed = -10.5f;   // Speed when jumping up
-    const float mSpeed = 4.5f;         // Side movement speed
+    const float mGravity = 0.3f;      // Constant downward force
+    const float mJumpSpeed = -9.5f;   // Speed when jumping up
+    const float mSpeed = 4.2f;         // Side movement speed
 };

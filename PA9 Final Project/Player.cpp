@@ -6,9 +6,9 @@
 // Constructor - loads the doodle sprite and sets initial position
 Player::Player() 
 {
-    if (!mTexture.loadFromFile("doodle.png")) 
+    if (!mTexture.loadFromFile("doodle.jpg")) 
     {
-        std::cerr << "Error: Failed to load doodle.png\n";
+        std::cerr << "Error: Failed to load doodle.jpg\n";
     }
 
     // Set texture to the sprite (sf::Sprite parent class)
