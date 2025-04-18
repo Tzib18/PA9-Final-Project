@@ -4,6 +4,7 @@
 #include "SFML/Window.hpp"
 #include <iostream>
 #include "Player.hpp"
+#include "Platform.hpp"
 
 // end goal worked i was able to start it on the pc and then transfer it to my laptop
 int main(void)
