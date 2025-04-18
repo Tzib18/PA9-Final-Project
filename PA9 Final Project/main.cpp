@@ -41,9 +41,9 @@ int main(void)
 
     /***** Platform Setup *****/
     sf::Texture platformTexture;
-    if (!platformTexture.loadFromFile("mock_platform.png"))
+    if (!platformTexture.loadFromFile("platform.png"))
     {
-        std::cerr << "Failed to load mock_platform.png" << std::endl;
+        std::cerr << "Failed to load platform.png" << std::endl;
         return -1;
     }
 
