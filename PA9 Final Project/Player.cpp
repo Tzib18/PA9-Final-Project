@@ -6,9 +6,9 @@
 // Constructor - loads the doodle sprite and sets initial position
 Player::Player() 
 {
-    if (!mTexture.loadFromFile("doodle.jpg")) 
+    if (!mTexture.loadFromFile("main_character.png")) 
     {
-        std::cerr << "Error: Failed to load doodle.jpg\n";
+        std::cerr << "Error: Failed to load main_character.png" << std::endl;
     }
 
     // Set texture to the sprite (sf::Sprite parent class)
@@ -18,7 +18,7 @@ Player::Player()
     this->setPosition(400.f, 300.f);
 
     // Scale down the player sprite to make it smaller
-    this->setScale(0.5f, 0.5f); // Feel free to Adjust scale as needed
+    this->setScale(1.0f, 1.0f); // Feel free to Adjust scale as needed
 
     // Initial vertical velocity (gravity effect)
     mVelocityY = 0.f;
