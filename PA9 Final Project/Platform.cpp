@@ -16,3 +16,8 @@ sf::FloatRect Platform::getBounds() const
 {
     return this->getGlobalBounds();
 }
+
+
+
+
+
