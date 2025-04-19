@@ -1,5 +1,4 @@
 
-
 #pragma once
 
 #include <SFML/Graphics.hpp>
@@ -17,5 +16,6 @@ public:
 private:
     sf::Texture* mTexture; // Shared texture pointer (does not own memory)
 };
+
 
 

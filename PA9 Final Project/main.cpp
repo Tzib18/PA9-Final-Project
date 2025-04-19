@@ -1,15 +1,16 @@
-#include "SFML/Graphics.hpp"
-#include "SFML/System.hpp"
-#include "SFML/Audio.hpp"
-#include "SFML/Window.hpp"
+
+// SFML PA9 Doodle Jump
+#include <SFML/Graphics.hpp>
 #include <iostream>
+#include <vector>
+#include <cstdlib>
+#include <ctime>
 #include "Player.hpp"
 #include "Platform.hpp"
 
-// end goal worked i was able to start it on the pc and then transfer it to my laptop
-int main(void)
-{										
-/***** Window Setup *****/
+int main()
+{
+    /***** Window Setup *****/
     sf::RenderWindow window(sf::VideoMode(800, 600), "Doodle Jump - PA9");
     window.setFramerateLimit(60);
 
@@ -41,9 +42,9 @@ int main(void)
 
     /***** Platform Setup *****/
     sf::Texture platformTexture;
-    if (!platformTexture.loadFromFile("mock_platform.png"))
+    if (!platformTexture.loadFromFile("crop_platform.png"))
     {
-        std::cerr << "Failed to load mock_platform.png" << std::endl;
+        std::cerr << "Failed to load cro_platform.png" << std::endl;
         return -1;
     }
 
