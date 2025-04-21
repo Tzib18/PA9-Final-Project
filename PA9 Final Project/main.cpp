@@ -7,12 +7,17 @@
 #include <ctime>
 #include "Player.hpp"
 #include "Platform.hpp"
+#include "Menu.hpp" // Add this for the menu
 
 int main()
 {
     /***** Window Setup *****/
     sf::RenderWindow window(sf::VideoMode(800, 600), "Doodle Jump - PA9");
     window.setFramerateLimit(60);
+
+    /***** Run the Menu First *****/
+    Menu menu(window);
+    menu.run(); // Wait for spacebar to continue
 
     /***** View (Camera) *****/
     sf::View view = window.getDefaultView();
@@ -44,7 +49,7 @@ int main()
     sf::Texture platformTexture;
     if (!platformTexture.loadFromFile("crop_platform.png"))
     {
-        std::cerr << "Failed to load cro_platform.png" << std::endl;
+        std::cerr << "Failed to load crop_platform.png" << std::endl;
         return -1;
     }
 
@@ -149,23 +154,20 @@ int main()
         /***** Generate New Platforms Above View (Safer Spacing) *****/
         while (highestPlatformY > view.getCenter().y - 300.f)
         {
-            // Random vertical gap between 80 and 130 pixels
             highestPlatformY -= static_cast<float>(rand() % 50 + 80);
-
-            // Keep platforms within 400px window centered on screen
             float centerX = view.getCenter().x;
             float x = static_cast<float>((rand() % 400) + (centerX - 200));
-
             platforms.emplace_back(x, highestPlatformY, &platformTexture);
         }
 
         /***** Remove Platforms Far Below Screen *****/
-        platforms.erase(std::remove_if(platforms.begin(), platforms.end(), [&view](const Platform& p)
+        float screenBottom = view.getCenter().y + static_cast<float>(window.getSize().y) / 2.f;
+
+        platforms.erase(std::remove_if(platforms.begin(), platforms.end(), [&](const Platform& p)
             {
-                return p.getPosition().y > view.getCenter().y + 400.f;
-            }),
-            platforms.end()
-        );
+                return p.getPosition().y > screenBottom + 100.f; // give extra room
+            }), platforms.end());
+
 
         /***** Drawing Everything *****/
         window.clear();
@@ -186,3 +188,4 @@ int main()
 
     return 0;
 }
+
