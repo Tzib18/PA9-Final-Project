@@ -74,7 +74,15 @@ int main()
         return -1;
     }
 
-    std::vector<Enemy> enemies;
+    sf::Texture EnemiesTexture;
+    if (!EnemiesTexture.loadFromFile("enemies.png")) {
+        std::cerr << "Failed to load enemies.png" << std::endl;
+        return -1;
+    }
+
+    std::vector<Enemy> Enemies1;  // from purple_glob
+    std::vector<Enemy> Enemies2;   // from enemies.png
+
 
     /***** Time and Random Seed *****/
     sf::Clock clock;
@@ -167,14 +175,21 @@ int main()
         {
             highestPlatformY -= static_cast<float>(rand() % 50 + 80);
             float centerX = view.getCenter().x;
-            float x = static_cast<float>((rand() % 400) + (centerX - 200));
+            float x = static_cast<float>((rand() % 350) + (centerX - 180)); // change platform position
             platforms.emplace_back(x, highestPlatformY, &platformTexture);
 
-            // Random chance to place a purple glob on this platform
-            if ((rand() % 11) == 0) 
-            { 
-                enemies.emplace_back(&purpleGlobTexture, x + 20.f, highestPlatformY - 40.f);
+            // Random chance to place a purple glob enemy
+            if ((rand() % 15) == 0) 
+            {
+                Enemies1.emplace_back(&purpleGlobTexture, x + 10.f, highestPlatformY - 40.f);
             }
+
+            // Random chance to place an enemies.png enemy
+            if ((rand() % 25) == 0) 
+            {
+                Enemies2.emplace_back(&EnemiesTexture, x + 10.f, highestPlatformY - 40.f);
+            }
+
         }
 
         /***** Remove Platforms Below Screen *****/
@@ -199,15 +214,38 @@ int main()
             window.draw(platform);
         }
 
-        for (auto& enemy : enemies) 
+        // update enemies:
+        for (auto& enemy : Enemies1)
+            enemy.update(deltaTime);
+
+        for (auto& enemy : Enemies2)
+            enemy.update(deltaTime);
+
+        // detect enemy and player collisions:
+        for (auto& enemy : Enemies1) 
         {
-            enemy.update(deltaTime); 
+            if (player.getGlobalBounds().intersects(enemy.getGlobalBounds())) 
+            {
+                std::cout << "Game Over! (killed by enemy)" << std::endl;
+                window.close();
+            }
         }
 
-        for (auto& enemy : enemies) 
+        for (auto& enemy : Enemies2) 
         {
-            window.draw(enemy);
+            if (player.getGlobalBounds().intersects(enemy.getGlobalBounds())) 
+            {
+                std::cout << "Game Over! (killed by enemy)" << std::endl;
+                window.close();
+            }
         }
+
+       // draw enemies:
+        for (auto& enemy : Enemies1)
+            window.draw(enemy);
+
+        for (auto& enemy : Enemies2)
+            window.draw(enemy);
 
         window.draw(player);
         window.display();
