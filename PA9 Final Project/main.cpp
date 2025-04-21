@@ -48,6 +48,7 @@ int main()
         return -1;
     }
 
+    // sets the palcement for the platforms 
     std::vector<Platform> platforms;
     platforms.emplace_back(100.f, 500.f, &platformTexture);
     platforms.emplace_back(300.f, 400.f, &platformTexture);
