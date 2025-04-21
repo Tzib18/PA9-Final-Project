@@ -8,6 +8,7 @@
 #include "Player.hpp"
 #include "Platform.hpp"
 #include "Menu.hpp" 
+#include "Enemy.hpp"
 
 int main()
 {
@@ -64,6 +65,16 @@ int main()
 
     /***** Player Setup *****/
     Player player;
+
+    /***** Enemy Setup *****/
+    sf::Texture purpleGlobTexture;
+    if (!purpleGlobTexture.loadFromFile("purple_glob.png")) 
+    {
+        std::cerr << "Failed to load purple_glob.png" << std::endl;
+        return -1;
+    }
+
+    std::vector<Enemy> enemies;
 
     /***** Time and Random Seed *****/
     sf::Clock clock;
@@ -158,9 +169,15 @@ int main()
             float centerX = view.getCenter().x;
             float x = static_cast<float>((rand() % 400) + (centerX - 200));
             platforms.emplace_back(x, highestPlatformY, &platformTexture);
+
+            // Random chance to place a purple glob on this platform
+            if ((rand() % 11) == 0) 
+            { 
+                enemies.emplace_back(&purpleGlobTexture, x + 20.f, highestPlatformY - 40.f);
+            }
         }
 
-        /***** Remove Platforms Far Below Screen *****/
+        /***** Remove Platforms Below Screen *****/
         float screenBottom = view.getCenter().y + static_cast<float>(window.getSize().y) / 2.f;
 
         platforms.erase(std::remove_if(platforms.begin(), platforms.end(), [&](const Platform& p)
@@ -180,6 +197,16 @@ int main()
         for (auto& platform : platforms)
         {
             window.draw(platform);
+        }
+
+        for (auto& enemy : enemies) 
+        {
+            enemy.update(deltaTime); 
+        }
+
+        for (auto& enemy : enemies) 
+        {
+            window.draw(enemy);
         }
 
         window.draw(player);
