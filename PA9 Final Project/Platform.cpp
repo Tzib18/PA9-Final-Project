@@ -8,6 +8,8 @@ Platform::Platform(float x, float y, sf::Texture* texture)
 {
     mTexture = texture;
     this->setTexture(*mTexture);
+    // Scale it down — try these values first
+    this->setScale(0.32f, 0.45f); // Shrinks width and height
     this->setPosition(x, y);
 }
 
