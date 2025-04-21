@@ -1,13 +1,14 @@
 
 // SFML PA9 Doodle Jump
 #include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
 #include <iostream>
 #include <vector>
 #include <cstdlib>
 #include <ctime>
 #include "Player.hpp"
 #include "Platform.hpp"
-#include "Menu.hpp" 
+#include "Menu.hpp"
 #include "Enemy.hpp"
 
 int main()
@@ -25,7 +26,7 @@ int main()
 
     /***** Background Setup *****/
     sf::Texture bgTexture;
-    if (!bgTexture.loadFromFile("paper_background.jpg"))
+    if (!bgTexture.loadFromFile("paper_background.jpg")) 
     {
         std::cerr << "Failed to load paper_background.jpg" << std::endl;
         return -1;
@@ -54,12 +55,14 @@ int main()
         return -1;
     }
 
-    std::vector<Platform> platforms;
-    platforms.emplace_back(100.f, 500.f, &platformTexture);
-    platforms.emplace_back(300.f, 400.f, &platformTexture);
-    platforms.emplace_back(150.f, 300.f, &platformTexture);
-    platforms.emplace_back(350.f, 200.f, &platformTexture);
-    platforms.emplace_back(200.f, 100.f, &platformTexture);
+    std::vector<Platform> platforms = 
+    {
+        Platform(100.f, 500.f, &platformTexture),
+        Platform(300.f, 400.f, &platformTexture),
+        Platform(150.f, 300.f, &platformTexture),
+        Platform(350.f, 200.f, &platformTexture),
+        Platform(200.f, 100.f, &platformTexture)
+    };
 
     float highestPlatformY = 100.f;
 
@@ -75,25 +78,35 @@ int main()
     }
 
     sf::Texture EnemiesTexture;
-    if (!EnemiesTexture.loadFromFile("enemies.png")) {
+    if (!EnemiesTexture.loadFromFile("enemies.png")) 
+    {
         std::cerr << "Failed to load enemies.png" << std::endl;
         return -1;
     }
 
-    std::vector<Enemy> Enemies1;  // from purple_glob
-    std::vector<Enemy> Enemies2;   // from enemies.png
+    std::vector<Enemy> Enemies1;
+    std::vector<Enemy> Enemies2;
 
+    /***** Sound Setup *****/
+    sf::SoundBuffer deathBuffer;
+    if (!deathBuffer.loadFromFile("player_death_sound.wav")) 
+    {
+        std::cerr << "Failed to load player_death_sound.wav" << std::endl;
+        return -1;
+    }
+    sf::Sound deathSound;
+    deathSound.setBuffer(deathBuffer);
 
     /***** Time and Random Seed *****/
     sf::Clock clock;
     std::srand(static_cast<unsigned int>(std::time(nullptr)));
 
     /***** Game Loop *****/
-    while (window.isOpen())
+    while (window.isOpen()) 
     {
         /***** Event Polling *****/
         sf::Event event;
-        while (window.pollEvent(event))
+        while (window.pollEvent(event)) 
         {
             if (event.type == sf::Event::Closed)
                 window.close();
@@ -109,40 +122,34 @@ int main()
         /***** Horizontal Wraparound with Height Locking *****/
         sf::Vector2f playerPos = player.getPosition();
         float playerWidth = player.getGlobalBounds().width;
-        float yLock = playerPos.y; // Save current height before teleport
+        float yLock = playerPos.y;
 
         if (playerPos.x > view.getCenter().x + 400.f)
-        {
             player.setPosition(view.getCenter().x - 400.f - playerWidth, yLock);
-        }
         if (playerPos.x + playerWidth < view.getCenter().x - 400.f)
-        {
             player.setPosition(view.getCenter().x + 400.f, yLock);
-        }
 
         /***** Platform Collision *****/
-        for (auto& platform : platforms)
+        for (auto& platform : platforms) 
         {
-            if (player.getBounds().intersects(platform.getBounds()))
+            if (player.getBounds().intersects(platform.getBounds())) 
             {
                 float playerBottom = player.getPosition().y + player.getGlobalBounds().height;
                 float platformTop = platform.getPosition().y;
                 if (player.getVelocityY() > 0 && playerBottom < platformTop + 10.f)
-                {
                     player.jump();
-                }
             }
         }
 
         /***** Camera Follows Player Upward *****/
-        if (player.getPosition().y < view.getCenter().y - 100.f)
+        if (player.getPosition().y < view.getCenter().y - 100.f) 
         {
             view.setCenter(view.getCenter().x, player.getPosition().y + 100.f);
             window.setView(view);
         }
 
         /***** Game Over: Fell Below Screen *****/
-        if (player.getPosition().y > view.getCenter().y + 300.f)
+        if (player.getPosition().y > view.getCenter().y + 300.f) 
         {
             std::cout << "Game Over!" << std::endl;
             window.close();
@@ -150,7 +157,6 @@ int main()
 
         /***** Add Background Tiles Before Needed *****/
         float topOfView = view.getCenter().y - window.getSize().y / 2.f;
-
         while (topOfView - window.getSize().y < highestBG)
         {
             sf::Sprite newBG(bgTexture);
@@ -161,72 +167,51 @@ int main()
         }
 
         /***** Remove Backgrounds Far Below Screen *****/
-        backgrounds.erase(std::remove_if(backgrounds.begin(), backgrounds.end(), [&view, &window](const sf::Sprite& bg)
+        backgrounds.erase(std::remove_if(backgrounds.begin(), backgrounds.end(),
+            [&view, &window](const sf::Sprite& bg) 
             {
                 float bgTop = bg.getPosition().y;
                 float viewBottom = view.getCenter().y + window.getSize().y / 2.f;
                 return bgTop > viewBottom + window.getSize().y;
-            }),
-            backgrounds.end()
-        );
+            }), backgrounds.end());
 
         /***** Generate New Platforms Above View (Safer Spacing) *****/
-        while (highestPlatformY > view.getCenter().y - 300.f)
+        while (highestPlatformY > view.getCenter().y - 300.f) 
         {
             highestPlatformY -= static_cast<float>(rand() % 50 + 80);
             float centerX = view.getCenter().x;
-            float x = static_cast<float>((rand() % 350) + (centerX - 180)); // change platform position
+            float x = static_cast<float>((rand() % 350) + (centerX - 180));
             platforms.emplace_back(x, highestPlatformY, &platformTexture);
 
-            // Random chance to place a purple glob enemy
-            if ((rand() % 15) == 0) 
-            {
+            if ((rand() % 15) == 0)
                 Enemies1.emplace_back(&purpleGlobTexture, x + 10.f, highestPlatformY - 40.f);
-            }
-
-            // Random chance to place an enemies.png enemy
-            if ((rand() % 25) == 0) 
-            {
+            if ((rand() % 25) == 0)
                 Enemies2.emplace_back(&EnemiesTexture, x + 10.f, highestPlatformY - 40.f);
-            }
-
         }
 
         /***** Remove Platforms Below Screen *****/
         float screenBottom = view.getCenter().y + static_cast<float>(window.getSize().y) / 2.f;
-
-        platforms.erase(std::remove_if(platforms.begin(), platforms.end(), [&](const Platform& p)
+        platforms.erase(std::remove_if(platforms.begin(), platforms.end(),
+            [&](const Platform& p) 
             {
-                return p.getPosition().y > screenBottom + 100.f; // give extra room
+                return p.getPosition().y > screenBottom + 100.f;
             }), platforms.end());
 
-
-        /***** Drawing Everything *****/
+        /***** Update and Draw Everything *****/
         window.clear();
+        for (auto& bg : backgrounds) window.draw(bg);
+        for (auto& platform : platforms) window.draw(platform);
 
-        for (auto& bg : backgrounds)
-        {
-            window.draw(bg);
-        }
+        for (auto& enemy : Enemies1) enemy.update(deltaTime);
+        for (auto& enemy : Enemies2) enemy.update(deltaTime);
 
-        for (auto& platform : platforms)
-        {
-            window.draw(platform);
-        }
-
-        // update enemies:
-        for (auto& enemy : Enemies1)
-            enemy.update(deltaTime);
-
-        for (auto& enemy : Enemies2)
-            enemy.update(deltaTime);
-
-        // detect enemy and player collisions:
         for (auto& enemy : Enemies1) 
         {
             if (player.getGlobalBounds().intersects(enemy.getGlobalBounds())) 
             {
+                deathSound.play();
                 std::cout << "Game Over! (killed by enemy)" << std::endl;
+                sf::sleep(sf::seconds(1.0f));
                 window.close();
             }
         }
@@ -235,17 +220,15 @@ int main()
         {
             if (player.getGlobalBounds().intersects(enemy.getGlobalBounds())) 
             {
+                deathSound.play();
                 std::cout << "Game Over! (killed by enemy)" << std::endl;
+                sf::sleep(sf::seconds(1.0f));
                 window.close();
             }
         }
 
-       // draw enemies:
-        for (auto& enemy : Enemies1)
-            window.draw(enemy);
-
-        for (auto& enemy : Enemies2)
-            window.draw(enemy);
+        for (auto& enemy : Enemies1) window.draw(enemy);
+        for (auto& enemy : Enemies2) window.draw(enemy);
 
         window.draw(player);
         window.display();
