@@ -7,7 +7,7 @@
 #include <ctime>
 #include "Player.hpp"
 #include "Platform.hpp"
-#include "Menu.hpp" // Add this for the menu
+#include "Menu.hpp" 
 
 int main()
 {
@@ -47,9 +47,9 @@ int main()
 
     /***** Platform Setup *****/
     sf::Texture platformTexture;
-    if (!platformTexture.loadFromFile("crop_platform.png"))
+    if (!platformTexture.loadFromFile("platform.png"))
     {
-        std::cerr << "Failed to load crop_platform.png" << std::endl;
+        std::cerr << "Failed to load platform.png" << std::endl;
         return -1;
     }
 
