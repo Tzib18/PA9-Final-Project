@@ -12,7 +12,7 @@
 #include "BackgroundAudioTrack.hpp"
 #include "Enemy.hpp"
 #include "Bullet.hpp"
-
+// running application 
 int main()
 {
     sf::RenderWindow window(sf::VideoMode(800, 600), "Doodle Jump - PA9");
