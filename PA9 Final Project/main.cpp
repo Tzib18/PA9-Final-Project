@@ -198,13 +198,18 @@ int main()
         if (player.getPosition().y > view.getCenter().y + 300.f)
         {
             // Save new highscore if beaten
-            if (elapsedTime > highscoreTime) {
+            if (elapsedTime > highscoreTime) 
+            {
                 std::ofstream outFile("highscore.txt");
-                if (outFile.is_open()) {
+                if (outFile.is_open())
+                {
                     int hsMin = static_cast<int>(elapsedTime.asSeconds()) / 60;
                     int hsSec = static_cast<int>(elapsedTime.asSeconds()) % 60;
                     outFile << hsMin << ":" << (hsSec < 10 ? "0" : "") << hsSec;
                     outFile.close();
+
+                    std::cout << "New Highscore! Time: " << hsMin << ":"
+                        << (hsSec < 10 ? "0" : "") << hsSec << std::endl;
                 }
             }
             deathSound.play();
@@ -397,8 +402,8 @@ int main()
         int seconds = static_cast<int>(elapsedTime.asSeconds()) % 60;
         scoreText.setString("Time: " + std::to_string(minutes) + ":" + (seconds < 10 ? "0" : "") + std::to_string(seconds));
 
-        // ***** RENDER EVERYTHING *****
-        window.clear();
+        // *****RENDER EVERYTHING *****
+            window.clear();
         for (auto& bg : backgrounds) window.draw(bg);
         for (auto& platform : platforms) window.draw(platform);
         for (auto& mp : movingPlatforms) window.draw(mp);
@@ -407,8 +412,15 @@ int main()
         for (auto& enemy : Enemies1) window.draw(enemy);
         for (auto& enemy : Enemies2) window.draw(enemy);
         window.draw(player);
-        window.draw(scoreText);
-        if (isMuted) window.draw(muteIcon);
+
+        // ***** DRAW HUD (STATIC ITEMS) *****
+        window.setView(window.getDefaultView());  // Reset to default view (locks HUD)
+
+        window.draw(scoreText);  // Draw the time (score)
+        if (isMuted) window.draw(muteIcon);  // Draw mute icon
+
+        window.setView(view);  // camera follows player
+
         window.display();
     }
 
