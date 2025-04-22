@@ -8,12 +8,19 @@
 #include "Player.hpp"
 #include "Platform.hpp"
 #include "Menu.hpp" 
+#include "BackgroundAudioTrack.hpp"
 
 int main()
 {
     /***** Window Setup *****/
     sf::RenderWindow window(sf::VideoMode(800, 600), "Doodle Jump - PA9");
     window.setFramerateLimit(60);
+
+    /***** loading the music file **********/
+    SoundTrack musicPlayer; 
+    musicPlayer.playMusic(); 
+
+
 
     /***** Run the Menu First *****/
     Menu menu(window);
