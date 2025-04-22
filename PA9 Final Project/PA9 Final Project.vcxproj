@@ -147,11 +147,15 @@
     <ClCompile Include="Player.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="BackgroundAudioTrack.hpp" />
     <ClInclude Include="Bullet.hpp" />
     <ClInclude Include="Enemy.hpp" />
     <ClInclude Include="Menu.hpp" />
     <ClInclude Include="Platform.hpp" />
     <ClInclude Include="Player.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Font Include="OpenSans.ttf" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
