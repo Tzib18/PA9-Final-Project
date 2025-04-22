@@ -151,7 +151,9 @@ int main()
 
         if (player.getPosition().y > view.getCenter().y + 300.f)
         {
-            std::cout << "Game Over!" << std::endl;
+            deathSound.play();  //Play death sound
+            std::cout << "Game Over! (fell off)" << std::endl;
+            sf::sleep(sf::seconds(1.0f)); // Let the sound finish before closing
             window.close();
         }
 
