@@ -8,29 +8,24 @@
 #include <ctime>
 #include "Player.hpp"
 #include "Platform.hpp"
-#include "Menu.hpp" 
+#include "Menu.hpp"
 #include "BackgroundAudioTrack.hpp"
 #include "Enemy.hpp"
 #include "Bullet.hpp"
 
-
+// running application 
 int main()
 {
-    /***** Window Setup *****/
     sf::RenderWindow window(sf::VideoMode(800, 600), "Doodle Jump - PA9");
     window.setFramerateLimit(60);
 
-    /***** loading the music file **********/
-    SoundTrack musicPlayer; 
-    musicPlayer.playMusic(); 
+    // ***** MUSIC SETUP *****
+    SoundTrack musicPlayer;
+    musicPlayer.playMusic();
 
-
-
-    /***** Run the Menu First *****/
     Menu menu(window);
     menu.run();
 
-    /***** View (Camera) *****/
     sf::View view = window.getDefaultView();
 
     /******Pause Menu Setup*****/
@@ -43,61 +38,43 @@ int main()
 
     /***** Background Setup *****/
     sf::Texture bgTexture;
-    if (!bgTexture.loadFromFile("paper_background.jpg"))
-    {
-        std::cerr << "Failed to load paper_background.jpg" << std::endl;
-        return -1;
-    }
-
+    if (!bgTexture.loadFromFile("paper_background.jpg")) return -1;
     sf::Vector2u bgSize = bgTexture.getSize();
     float bgScaleX = static_cast<float>(window.getSize().x) / bgSize.x;
     float bgScaleY = static_cast<float>(window.getSize().y) / bgSize.y;
 
     std::vector<sf::Sprite> backgrounds;
-    for (int y = 0; y <= 1800; y += window.getSize().y) 
+    for (int y = 0; y <= 1800; y += window.getSize().y)
     {
         sf::Sprite bg(bgTexture);
         bg.setScale(bgScaleX, bgScaleY);
         bg.setPosition(0.f, -static_cast<float>(y));
         backgrounds.push_back(bg);
     }
-
     float highestBG = backgrounds.front().getPosition().y;
 
-    /***** Platform Setup *****/
     sf::Texture platformTexture;
-    if (!platformTexture.loadFromFile("platform.png"))
-    {
-        std::cerr << "Failed to load platform.png" << std::endl;
-        return -1;
-    }
-
-    std::vector<Platform> platforms =
-    {
+    if (!platformTexture.loadFromFile("platform.png")) return -1;
+    std::vector<Platform> platforms = {
         Platform(100.f, 500.f, &platformTexture),
         Platform(300.f, 400.f, &platformTexture),
         Platform(150.f, 300.f, &platformTexture),
         Platform(350.f, 200.f, &platformTexture),
         Platform(200.f, 100.f, &platformTexture)
     };
-
     float highestPlatformY = 100.f;
 
-    /***** Player Setup *****/
     Player player;
 
-    /***** Enemy Setup *****/
     sf::Texture purpleGlobTexture, EnemiesTexture;
     if (!purpleGlobTexture.loadFromFile("purple_glob.png")) return -1;
     if (!EnemiesTexture.loadFromFile("enemies.png")) return -1;
     std::vector<Enemy> Enemies1, Enemies2;
 
-    /***** Bullet Setup *****/
     sf::Texture bulletTexture;
     if (!bulletTexture.loadFromFile("Bullet.png")) return -1;
     std::vector<Bullet> bullets;
 
-    /***** Sound Setup *****/
     bool isMuted = false;
     sf::SoundBuffer deathBuffer, bulletBuffer, globDeathBuffer, enemy2DeathBuffer;
     sf::Sound deathSound, bulletSound, globDeathSound, enemy2DeathSound;
@@ -110,38 +87,31 @@ int main()
     globDeathSound.setBuffer(globDeathBuffer);
     enemy2DeathSound.setBuffer(enemy2DeathBuffer);
 
-    /***** Mute Icon Setup *****/
     sf::Texture muteIconTexture;
-    if (!muteIconTexture.loadFromFile("mute.png")) 
-    {
-        std::cerr << "Failed to load mute icon!" << std::endl;
-        return -1;
-    }
+    if (!muteIconTexture.loadFromFile("mute.png")) return -1;
     sf::Sprite muteIcon(muteIconTexture);
     muteIcon.setScale(0.05f, 0.05f);
 
-    /***** Time and Random Seed *****/
     sf::Clock clock;
     std::srand(static_cast<unsigned int>(std::time(nullptr)));
 
-    /***** Game Loop *****/
     while (window.isOpen())
     {
         sf::Event event;
-        while (window.pollEvent(event)) 
+        while (window.pollEvent(event))
         {
             if (event.type == sf::Event::Closed)
                 window.close();
 
-            if (event.type == sf::Event::KeyPressed) 
+            if (event.type == sf::Event::KeyPressed)
             {
-                if (event.key.code == sf::Keyboard::Space) 
+                if (event.key.code == sf::Keyboard::Space)
                 {
                     sf::Vector2f pos = player.getPosition();
                     bullets.emplace_back(&bulletTexture, pos.x + player.getGlobalBounds().width / 2.f - 5.f, pos.y);
                     bulletSound.play();
                 }
-                else if (event.key.code == sf::Keyboard::M) 
+                else if (event.key.code == sf::Keyboard::M)
                 {
                     isMuted = !isMuted;
                     float vol = isMuted ? 0.f : 100.f;
@@ -149,6 +119,12 @@ int main()
                     bulletSound.setVolume(vol);
                     globDeathSound.setVolume(vol);
                     enemy2DeathSound.setVolume(vol);
+
+                    if (isMuted)
+                        musicPlayer.stopMusic();
+                    else
+                        musicPlayer.playMusic();
+
                     std::cout << (isMuted ? "Muted." : "Unmuted.") << std::endl;
                 }
                 else if (event.key.code == sf::Keyboard::Escape)
@@ -176,6 +152,7 @@ int main()
                 player.setPosition(view.getCenter().x + 400.f, yLock);
 
             for (auto& platform : platforms)
+            if (player.getBounds().intersects(platform.getBounds()))
             {
                 if (player.getBounds().intersects(platform.getBounds()))
                 {
@@ -185,7 +162,6 @@ int main()
                         player.jump();
                 }
             }
-
             if (player.getPosition().y < view.getCenter().y - 100.f)
             {
                 view.setCenter(view.getCenter().x, player.getPosition().y + 100.f);
@@ -200,6 +176,30 @@ int main()
 
             float topOfView = view.getCenter().y - window.getSize().y / 2.f;
             while (topOfView - window.getSize().y < highestBG)
+        if (player.getPosition().y < view.getCenter().y - 100.f)
+        {
+            view.setCenter(view.getCenter().x, player.getPosition().y + 100.f);
+            window.setView(view);
+        }
+
+        if (player.getPosition().y > view.getCenter().y + 300.f)
+        {
+            std::cout << " WOMP WOMP!!! Do better" << std::endl;
+            window.close();
+        }
+
+        float topOfView = view.getCenter().y - window.getSize().y / 2.f;
+        while (topOfView - window.getSize().y < highestBG)
+        {
+            sf::Sprite newBG(bgTexture);
+            newBG.setScale(bgScaleX, bgScaleY);
+            highestBG -= window.getSize().y;
+            newBG.setPosition(0.f, highestBG);
+            backgrounds.push_back(newBG);
+        }
+
+        backgrounds.erase(std::remove_if(backgrounds.begin(), backgrounds.end(),
+            [&view, &window](const sf::Sprite& bg)
             {
                 sf::Sprite newBG(bgTexture);
                 newBG.setScale(bgScaleX, bgScaleY);
@@ -235,6 +235,33 @@ int main()
                     }
                 }
             }
+        while (highestPlatformY > view.getCenter().y - 300.f)
+        {
+            highestPlatformY -= static_cast<float>(rand() % 50 + 80);
+            float centerX = view.getCenter().x;
+            float x = static_cast<float>((rand() % 350) + (centerX - 180));
+            platforms.emplace_back(x, highestPlatformY, &platformTexture);
+            if ((rand() % 5) == 0)
+            {
+                if ((rand() % 2) == 0)
+                {
+                    Enemies1.emplace_back(&purpleGlobTexture, x + 10.f, highestPlatformY - 40.f);
+                    Enemies1.back().setScale(0.15f, 0.15f);
+                }
+                else 
+                {
+                    Enemies2.emplace_back(&EnemiesTexture, x + 10.f, highestPlatformY - 40.f);
+                    Enemies2.back().setScale(0.5f, 0.5f);
+                }
+            }
+        }
+
+        float screenBottom = view.getCenter().y + static_cast<float>(window.getSize().y) / 2.f;
+        platforms.erase(std::remove_if(platforms.begin(), platforms.end(),
+            [&](const Platform& p)
+            {
+                return p.getPosition().y > screenBottom + 100.f;
+            }), platforms.end());
 
             float screenBottom = view.getCenter().y + static_cast<float>(window.getSize().y) / 2.f;
             platforms.erase(std::remove_if(platforms.begin(), platforms.end(),
@@ -255,6 +282,23 @@ int main()
                 }), bullets.end());
 
             for (auto& enemy : Enemies1)
+        float screenTop = view.getCenter().y - window.getSize().y / 2.f;
+        bullets.erase(std::remove_if(bullets.begin(), bullets.end(),
+            [screenTop](const Bullet& b) { return b.isOffScreen(screenTop); }), bullets.end());
+
+        for (auto& enemy : Enemies1)
+        {
+            if (player.getGlobalBounds().intersects(enemy.getGlobalBounds()))
+            {
+                deathSound.play();
+                std::cout << "Game Over! (hit enemy)" << std::endl;
+                sf::sleep(sf::seconds(1.0f));
+                window.close();
+            }
+        }
+        for (auto& enemy : Enemies2)
+        {
+            if (player.getGlobalBounds().intersects(enemy.getGlobalBounds()))
             {
                 if (player.getGlobalBounds().intersects(enemy.getGlobalBounds()))
                 {
@@ -268,6 +312,13 @@ int main()
             for (auto& enemy : Enemies2)
             {
                 if (player.getGlobalBounds().intersects(enemy.getGlobalBounds()))
+        for (auto bulletIt = bullets.begin(); bulletIt != bullets.end(); )
+        {
+            bool hit = false;
+
+            for (auto enemyIt = Enemies1.begin(); enemyIt != Enemies1.end(); )
+            {
+                if (bulletIt->getGlobalBounds().intersects(enemyIt->getGlobalBounds()))
                 {
                     deathSound.play();
                     std::cout << "Game Over! (hit enemy)" << std::endl;
@@ -277,6 +328,7 @@ int main()
             }
 
             for (auto bulletIt = bullets.begin(); bulletIt != bullets.end(); )
+            if (!hit)
             {
                 bool hit = false;
 
@@ -315,11 +367,9 @@ int main()
 
         }
 
-        // Update mute icon position to stick bottom-left
         muteIcon.setPosition(view.getCenter().x - window.getSize().x / 2.f + 10.f,
             view.getCenter().y + window.getSize().y / 2.f - 60.f);
 
-        // Draw Everything
         window.clear();
         for (auto& bg : backgrounds) window.draw(bg);
         for (auto& platform : platforms) window.draw(platform);

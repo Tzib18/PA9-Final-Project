@@ -1,17 +1,16 @@
-#pragma once
 
 #pragma once
 
 #include <SFML/Graphics.hpp>
 #include <SFML/Audio.hpp>
 
-class SoundTrack {
+class SoundTrack 
+{
 private:
 	sf::Music backgroundMusic; // makes the object for the background Music
 	std::vector<std::string> musicFiles; // paths to the music files
 	std::string	currentTrack; // the current track that is being played 
 public:
-	// constructor 
 	SoundTrack() {
 		// initializes the time seed for the music files (randomizes) 
 		std::srand(static_cast<unsigned int>(std::time(nullptr)));
@@ -49,4 +48,3 @@ public:
 	}
 	
 };
-
