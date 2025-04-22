@@ -5,11 +5,11 @@ Enemy::Enemy(sf::Texture* texture, float x, float y)
 {
     mTexture = texture;
     setTexture(*mTexture);
-    setScale(0.15f, 0.15f);
-    setPosition(x, y);
+    setPosition(x, y); // Position first
 
-    mSpeed = 50.f;        // pixels per second
-    mMovingRight = (rand() % 2 == 0);  // random start direction
+    // Scale is now handled in main.cpp after spawn
+    mSpeed = 50.f;
+    mMovingRight = (rand() % 2 == 0);
 }
 
 void Enemy::update(float deltaTime) 
