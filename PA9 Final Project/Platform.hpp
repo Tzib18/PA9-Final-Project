@@ -1,4 +1,3 @@
-
 #pragma once
 
 #include <SFML/Graphics.hpp>
@@ -14,8 +13,6 @@ public:
     sf::FloatRect getBounds() const;
 
 private:
-    sf::Texture* mTexture; // Shared texture pointer (does not own memory)
+    sf::Texture* mTexture; 
 };
-
-
 

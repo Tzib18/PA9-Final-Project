@@ -140,9 +140,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Bullet.cpp" />
+    <ClCompile Include="CrackedPlatform.cpp" />
     <ClCompile Include="Enemy.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Menu.cpp" />
+    <ClCompile Include="MovingPlatform.cpp" />
     <ClCompile Include="Platform.cpp" />
     <ClCompile Include="player score.cpp" />
     <ClCompile Include="Player.cpp" />
@@ -150,13 +152,15 @@
   <ItemGroup>
     <ClInclude Include="BackgroundAudioTrack.hpp" />
     <ClInclude Include="Bullet.hpp" />
+    <ClInclude Include="CrackedPlatform.hpp" />
     <ClInclude Include="Enemy.hpp" />
     <ClInclude Include="Menu.hpp" />
+    <ClInclude Include="MovingPlatform.hpp" />
     <ClInclude Include="Platform.hpp" />
     <ClInclude Include="Player.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <Font Include="OpenSans.ttf" />
+    <Text Include="highscore.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

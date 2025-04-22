@@ -1,5 +1,4 @@
 
-
 #include "Platform.hpp"
 #include <iostream>
 
@@ -18,6 +17,8 @@ sf::FloatRect Platform::getBounds() const
 {
     return this->getGlobalBounds();
 }
+
+
 
 
 
