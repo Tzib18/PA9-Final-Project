@@ -22,24 +22,24 @@ Menu::Menu(sf::RenderWindow& window) : mWindow(window)
 
     /***** Title Text *****/
     mTitleText.setFont(mFont);
-    mTitleText.setString("Doodle Jump");
+    mTitleText.setString("Doodle Jump!");
     mTitleText.setCharacterSize(48);
     mTitleText.setFillColor(sf::Color::Red);
-    mTitleText.setPosition(50.f, 100.f); // Left side
+    mTitleText.setPosition(50.f, 100.f); 
 
     /***** Play Text *****/
     mPlayText.setFont(mFont);
     mPlayText.setString("Press SPACE to Play");
     mPlayText.setCharacterSize(24);
     mPlayText.setFillColor(sf::Color::White);
-    mPlayText.setPosition(50.f, 200.f); // Left side
+    mPlayText.setPosition(50.f, 200.f); 
 
     /***** Mute Text *****/
     mMuteText.setFont(mFont);
     mMuteText.setString("Press M to Toggle Mute");
     mMuteText.setCharacterSize(24);
     mMuteText.setFillColor(sf::Color::White);
-    mMuteText.setPosition(50.f, 260.f); // Left side
+    mMuteText.setPosition(50.f, 260.f); 
 }
 
 void Menu::run() 
