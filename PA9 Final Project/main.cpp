@@ -27,7 +27,8 @@ int main()
 
     /***** Background Setup *****/
     sf::Texture bgTexture;
-    if (!bgTexture.loadFromFile("paper_background.jpg")) {
+    if (!bgTexture.loadFromFile("paper_background.jpg"))
+    {
         std::cerr << "Failed to load paper_background.jpg" << std::endl;
         return -1;
     }
@@ -37,7 +38,8 @@ int main()
     float bgScaleY = static_cast<float>(window.getSize().y) / bgSize.y;
 
     std::vector<sf::Sprite> backgrounds;
-    for (int y = 0; y <= 1800; y += window.getSize().y) {
+    for (int y = 0; y <= 1800; y += window.getSize().y) 
+    {
         sf::Sprite bg(bgTexture);
         bg.setScale(bgScaleX, bgScaleY);
         bg.setPosition(0.f, -static_cast<float>(y));
@@ -48,12 +50,14 @@ int main()
 
     /***** Platform Setup *****/
     sf::Texture platformTexture;
-    if (!platformTexture.loadFromFile("platform.png")) {
+    if (!platformTexture.loadFromFile("platform.png"))
+    {
         std::cerr << "Failed to load platform.png" << std::endl;
         return -1;
     }
 
-    std::vector<Platform> platforms = {
+    std::vector<Platform> platforms =
+    {
         Platform(100.f, 500.f, &platformTexture),
         Platform(300.f, 400.f, &platformTexture),
         Platform(150.f, 300.f, &platformTexture),
@@ -92,7 +96,8 @@ int main()
 
     /***** Mute Icon Setup *****/
     sf::Texture muteIconTexture;
-    if (!muteIconTexture.loadFromFile("mute.png")) {
+    if (!muteIconTexture.loadFromFile("mute.png")) 
+    {
         std::cerr << "Failed to load mute icon!" << std::endl;
         return -1;
     }
@@ -208,7 +213,8 @@ int main()
 
         float screenBottom = view.getCenter().y + static_cast<float>(window.getSize().y) / 2.f;
         platforms.erase(std::remove_if(platforms.begin(), platforms.end(),
-            [&](const Platform& p) {
+            [&](const Platform& p) 
+            {
                 return p.getPosition().y > screenBottom + 100.f;
             }), platforms.end());
 
@@ -218,7 +224,8 @@ int main()
 
         float screenTop = view.getCenter().y - window.getSize().y / 2.f;
         bullets.erase(std::remove_if(bullets.begin(), bullets.end(),
-            [screenTop](const Bullet& b) {
+            [screenTop](const Bullet& b)
+            {
                 return b.isOffScreen(screenTop);
             }), bullets.end());
 
