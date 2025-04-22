@@ -12,6 +12,7 @@
 #include "BackgroundAudioTrack.hpp"
 #include "Enemy.hpp"
 #include "Bullet.hpp"
+
 // running application 
 int main()
 {
@@ -151,7 +152,7 @@ int main()
 
         if (player.getPosition().y > view.getCenter().y + 300.f)
         {
-            std::cout << "Game Over!" << std::endl;
+            std::cout << " WOMP WOMP!!! Do better" << std::endl;
             window.close();
         }
 
