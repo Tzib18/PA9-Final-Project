@@ -13,7 +13,7 @@ public:
     Player();
 
     // Applies gravity and updates vertical position
-    void update(float deltaTime);
+   virtual void update(float deltaTime);
 
     // Handles A/D movement input (left/right)
     void handleInput();
@@ -36,7 +36,7 @@ private:
     float mVelocityY;          // Vertical speed (gravity or jump)
 
 
-    const float mGravity = -0.03f;      // Constant downward force
-    const float mJumpSpeed = -9.5f;   // Speed when jumping up
-    const float mSpeed = 4.2f;         // Side movement speed
+    const float mGravity = 0.5f;      // Constant downward force
+    const float mJumpSpeed = -13.5f;   // Speed when jumping up
+    const float mSpeed = 4.5f;         // Side movement speed
 };
