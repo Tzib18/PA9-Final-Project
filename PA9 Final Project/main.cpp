@@ -208,7 +208,10 @@ int main()
         }
 
         // ***** UPDATE GAME STATE *****
-        if (!pause) {
+        int score = 0;// initializing the score variable 
+
+        if (!pause)
+        {
             float deltaTime = clock.restart().asSeconds();
             elapsedTime = gameClock.getElapsedTime();
 
@@ -216,7 +219,7 @@ int main()
         player.update(deltaTime);
         
         /******* player score *******/
-        int score = 0;// initializing the score variable 
+
         PlayerScore(score, Enemies1, Enemies2, bullets);  // Update the score based on actions
 
 
@@ -463,10 +466,6 @@ int main()
         if (isMuted) window.draw(muteIcon);  // Draw mute icon
 
         window.setView(view);  // camera follows player
-
-        window.draw(scoreText);
-        if (isMuted) window.draw(muteIcon);
-
 
         /******* Display score on the screen *******/   
         sf::Text scoreText; 
