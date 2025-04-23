@@ -38,5 +38,5 @@ private:
 
     const float mGravity = 0.5f;      // Constant downward force
     const float mJumpSpeed = -13.5f;   // Speed when jumping up
-    const float mSpeed = 4.5f;         // Side movement speed
+    const float mSpeed = 5.6f;         // Side movement speed
 };

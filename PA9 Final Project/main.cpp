@@ -16,6 +16,7 @@
 #include "BackgroundAudioTrack.hpp"
 #include "Enemy.hpp"
 #include "Bullet.hpp"
+#include "Player score.hpp"
 
 int main()
 {
@@ -193,6 +194,11 @@ int main()
 
         player.handleInput();
         player.update(deltaTime);
+        
+        /******* player score *******/
+        int score = 0;// initializing the score variable 
+        PlayerScore(score, Enemies1, Enemies2, bullets);  // Update the score based on actions
+
 
         // ***** CHECK GAME OVER (PLAYER FALLS) *****
         if (player.getPosition().y > view.getCenter().y + 300.f)
@@ -409,6 +415,17 @@ int main()
         window.draw(player);
         window.draw(scoreText);
         if (isMuted) window.draw(muteIcon);
+
+        /******* Display score on the screen *******/   
+        sf::Text scoreText; 
+        scoreText.setFont(font);
+        scoreText.setCharacterSize(24);
+        scoreText.setFillColor(sf::Color::Black);
+        scoreText.setPosition(20.f, 20.f);
+        scoreText.setString("Score: " + std::to_string(score));
+        window.draw(scoreText);
+
+
         window.display();
     }
 
