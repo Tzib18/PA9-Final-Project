@@ -21,7 +21,7 @@
 int main()
 {
     // ***** WINDOW AND MUSIC SETUP *****
-    sf::RenderWindow window(sf::VideoMode(800, 600), "Malloc Jump (Inspired by Doodle Jump) - PA9");
+    sf::RenderWindow window(sf::VideoMode(1000, 800), "Malloc Jump (Inspired by Doodle Jump) - PA9");
     window.setFramerateLimit(60);
 
     SoundTrack musicPlayer;
