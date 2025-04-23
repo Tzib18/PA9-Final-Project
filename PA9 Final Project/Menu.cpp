@@ -32,21 +32,14 @@ Menu::Menu(sf::RenderWindow& window) : mWindow(window)
     mPlayText.setString("Press SPACE to Play");
     mPlayText.setCharacterSize(24);
     mPlayText.setFillColor(sf::Color::White);
-    mPlayText.setPosition(50.f, 200.f);
-
-    /***** Mute Text *****/
-    mMuteText.setFont(mFont);
-    mMuteText.setString("Press M to Toggle Mute");
-    mMuteText.setCharacterSize(24);
-    mMuteText.setFillColor(sf::Color::White);
-    mMuteText.setPosition(50.f, 260.f);
+    mPlayText.setPosition(50.f, 260.f);
 
     /***** How To Play Text *****/
     mHowToPlayText.setFont(mFont);
     mHowToPlayText.setString("Press H for How to Play");
     mHowToPlayText.setCharacterSize(24);
     mHowToPlayText.setFillColor(sf::Color::White);
-    mHowToPlayText.setPosition(50.f, 320.f);
+    mHowToPlayText.setPosition(50.f, 300.f);
 }
 
 void Menu::run()
@@ -96,7 +89,8 @@ void Menu::drawHowToPlay()
         "Shoot Up: Up Arrow\n"
         "Shoot Left: Left Arrow\n"
         "Shoot Right: Right Arrow\n"
-        "Mute: M\n\n"
+        "Mute: M\n"
+        "Pause: esc\n\n"
         "GOAL:\n"
         "Try to avoid enemies and falling.\n"
         "Shoot enemies to survive longer!\n\n"
