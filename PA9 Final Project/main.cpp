@@ -154,18 +154,21 @@ int main()
                 {
                     bullets.emplace_back(&bulletTextureUp, playerCenterX, playerTopY, sf::Vector2f(0.f, -600.f));  // Upward velocity
                     bulletSound.play();
+                    player.startShooting();
                 }
                 // Shoot LEFT
                 else if (event.key.code == sf::Keyboard::Left)
                 {
                     bullets.emplace_back(&bulletTextureLeft, playerCenterX, playerTopY, sf::Vector2f(-600.f, 0.f));  // Leftward velocity
                     bulletSound.play();
+                    player.startShooting();
                 }
                 // Shoot RIGHT
                 else if (event.key.code == sf::Keyboard::Right)
                 {
                     bullets.emplace_back(&bulletTextureRight, playerCenterX, playerTopY, sf::Vector2f(600.f, 0.f));   // Rightward velocity
                     bulletSound.play();
+                    player.startShooting();
                 }
                 // Toggle mute on M key press
                 else if (event.key.code == sf::Keyboard::M)
