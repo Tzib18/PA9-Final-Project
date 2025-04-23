@@ -457,9 +457,6 @@ int main()
 
         window.setView(view);  // camera follows player
 
-        window.draw(scoreText);
-        if (isMuted) window.draw(muteIcon);
-        if (pause) window.draw(pausedText);
         window.display();
     }
 
