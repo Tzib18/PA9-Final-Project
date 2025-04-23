@@ -1,5 +1,5 @@
 
-// SFML PA9 Doodle Jump
+// SFML PA9 Malloc Jump (Inspired by Doodle Jump)
 #include <SFML/Graphics.hpp>
 #include <SFML/Audio.hpp>
 #include <iostream>
@@ -28,9 +28,9 @@ int main()
     musicPlayer.playMusic();
 
     Menu menu(window);
-    menu.run();
+    menu.run(); // Show menu before game starts
 
-    sf::View view = window.getDefaultView();
+    sf::View view = window.getDefaultView(); // Camera view
 
     // ***** BACKGROUND SETUP *****
     sf::Texture bgTexture;
@@ -114,25 +114,47 @@ int main()
     std::srand(static_cast<unsigned int>(std::time(nullptr)));
 
     float highestPlatformY = 100.f;
+    float startingPlatformY = highestPlatformY;  // Save the starting platform height to use for heightScore calculations later
 
-    // ***** TIMER AND HIGHSCORE SETUP *****
+
+    // ***** TIMER, SCORE, AND HIGHSCORE SETUP *****
+    int killScore = 0;  // Tracks score from enemies killed
+    float maxHeight = player.getPosition().y;  // Track highest Y position (lower Y means higher in SFML)
+
+
     sf::Clock gameClock;  // Tracks elapsed game time
     sf::Time elapsedTime;
+
     sf::Font font;
     if (!font.loadFromFile("OpenSans.ttf")) return -1;
+
+    // ***** Timer Text Setup *****
+    sf::Text timerText;
+    timerText.setFont(font);
+    timerText.setCharacterSize(24);
+    timerText.setFillColor(sf::Color::Black);
+    timerText.setPosition(10.f, 10.f);  // Top-left
+
+    // ***** Score Text Setup *****
     sf::Text scoreText;
     scoreText.setFont(font);
     scoreText.setCharacterSize(24);
     scoreText.setFillColor(sf::Color::Black);
-    scoreText.setPosition(10.f, 10.f);
+    scoreText.setPosition(10.f, 40.f);  // Just below the timer
 
-    sf::Time highscoreTime;  // Holds the highscore time read from file
+    // ***** Highscore Text Setup *****
+    sf::Text highscoreText;
+    highscoreText.setFont(font);
+    highscoreText.setCharacterSize(24);
+    highscoreText.setFillColor(sf::Color::Black);
+    highscoreText.setPosition(10.f, 70.f);  // Below the score
+
+    // ***** Highscore Setup *****
+    int highscore = 0;  // Default highscore
     std::ifstream highscoreFile("highscore.txt");
-    if (highscoreFile.is_open()) {
-        int min, sec;
-        char colon;
-        highscoreFile >> min >> colon >> sec;
-        highscoreTime = sf::seconds(min * 60 + sec);
+    if (highscoreFile.is_open()) 
+    {
+        highscoreFile >> highscore;
         highscoreFile.close();
     }
 
@@ -207,51 +229,40 @@ int main()
             }
         }
 
-        // ***** UPDATE GAME STATE *****
-        // had to move it outside the loop inorder to get the bottom to work.
-        int score = 0;// initializing the score variable 
+        /******* player score *******/
+
+        int heightScore = static_cast<int>(startingPlatformY - maxHeight);  // How much higher player climbed from the first platform
+        int totalScore = killScore + heightScore;  // Total score = kills + height
+
         if (!pause) {
             float deltaTime = clock.restart().asSeconds();
             elapsedTime = gameClock.getElapsedTime();
 
         player.handleInput();
         player.update(deltaTime);
-        
-        /******* player score *******/
-        PlayerScore(score, Enemies1, Enemies2, bullets);  // Update the score based on actions
 
-
+        if (player.getPosition().y < maxHeight)  // Remember: lower y = higher in SFML
+            maxHeight = player.getPosition().y;
 
         // ***** CHECK GAME OVER (PLAYER FALLS) *****
         if (player.getPosition().y > view.getCenter().y + 300.f)
         {
             // Save new highscore if beaten
-            if (elapsedTime > highscoreTime) 
+            if (totalScore > highscore)
             {
                 std::ofstream outFile("highscore.txt");
                 if (outFile.is_open())
                 {
-                    int hsMin = static_cast<int>(elapsedTime.asSeconds()) / 60;
-                    int hsSec = static_cast<int>(elapsedTime.asSeconds()) % 60;
-                    outFile << hsMin << ":" << (hsSec < 10 ? "0" : "") << hsSec;
+                    outFile << totalScore;  // Save the new highscore
                     outFile.close();
-
-                    std::cout << "New Highscore! Time: " << hsMin << ":"
-                        << (hsSec < 10 ? "0" : "") << hsSec << std::endl;
-
-                    deathSound.play();
-                    std::cout << "Game Over! (fell off screen)" << std::endl;
-                    sf::sleep(sf::seconds(1.0f));
-                    window.close();
                 }
+                highscore = totalScore;  // <-- Update the displayed highscore too
+                std::cout << "New Highscore! Score: " << totalScore << std::endl;
             }
+
             else
             {
-                int hsMin = static_cast<int>(elapsedTime.asSeconds()) / 60;
-                int hsSec = static_cast<int>(elapsedTime.asSeconds()) % 60;
-
-                std::cout << "Score Time: " << hsMin << ":"
-                    << (hsSec < 10 ? "0" : "") << hsSec << std::endl;
+                std::cout << "Score: " << totalScore << std::endl;
             }
 
             deathSound.play();
@@ -366,15 +377,22 @@ int main()
                 if (player.getGlobalBounds().intersects(enemy.getGlobalBounds()))
                 {
                     // Save highscore if beaten
-                    if (elapsedTime > highscoreTime) {
+                    if (totalScore > highscore)
+                    {
                         std::ofstream outFile("highscore.txt");
-                        if (outFile.is_open()) {
-                            int hsMin = static_cast<int>(elapsedTime.asSeconds()) / 60;
-                            int hsSec = static_cast<int>(elapsedTime.asSeconds()) % 60;
-                            outFile << hsMin << ":" << (hsSec < 10 ? "0" : "") << hsSec;
+                        if (outFile.is_open())
+                        {
+                            outFile << totalScore;  // Save new highscore
                             outFile.close();
                         }
+                        highscore = totalScore;  // Update in-memory highscore
+                        std::cout << "New Highscore! Score: " << totalScore << std::endl;
                     }
+                    else
+                    {
+                        std::cout << "Score: " << totalScore << std::endl;
+                    }
+
                     deathSound.play();
                     std::cout << "Game Over! (hit enemy)" << std::endl;
                     sf::sleep(sf::seconds(1.0f));
@@ -385,15 +403,22 @@ int main()
             {
                 if (player.getGlobalBounds().intersects(enemy.getGlobalBounds()))
                 {
-                    if (elapsedTime > highscoreTime) {
+                    if (totalScore > highscore)
+                    {
                         std::ofstream outFile("highscore.txt");
-                        if (outFile.is_open()) {
-                            int hsMin = static_cast<int>(elapsedTime.asSeconds()) / 60;
-                            int hsSec = static_cast<int>(elapsedTime.asSeconds()) % 60;
-                            outFile << hsMin << ":" << (hsSec < 10 ? "0" : "") << hsSec;
+                        if (outFile.is_open())
+                        {
+                            outFile << totalScore;  // Save new highscore
                             outFile.close();
                         }
+                        highscore = totalScore;  // Update in-memory highscore
+                        std::cout << "New Highscore! Score: " << totalScore << std::endl;
                     }
+                    else
+                    {
+                        std::cout << "Score: " << totalScore << std::endl;
+                    }
+
                     deathSound.play();
                     std::cout << "Game Over! (hit enemy)" << std::endl;
                     sf::sleep(sf::seconds(1.0f));
@@ -412,6 +437,7 @@ int main()
                     {
                         globDeathSound.play();
                         enemyIt = Enemies1.erase(enemyIt);
+                        killScore += 20; // adds 20 points for each Glob kill
                         hit = true;
                         break;
                     }
@@ -426,6 +452,7 @@ int main()
                         {
                             enemy2DeathSound.play();
                             enemyIt = Enemies2.erase(enemyIt);
+                            killScore += 15; // adds 15 points for each enemy2  kill
                             hit = true;
                             break;
                         }
@@ -444,7 +471,11 @@ int main()
         // ***** UPDATE SCORE DISPLAY *****
         int minutes = static_cast<int>(elapsedTime.asSeconds()) / 60;
         int seconds = static_cast<int>(elapsedTime.asSeconds()) % 60;
-        scoreText.setString("Time: " + std::to_string(minutes) + ":" + (seconds < 10 ? "0" : "") + std::to_string(seconds));
+        // Update HUD (timer and score)
+        timerText.setString("Time: " + std::to_string(minutes) + ":" + (seconds < 10 ? "0" : "") + std::to_string(seconds));
+        scoreText.setString("Score: " + std::to_string(totalScore));
+        highscoreText.setString("Highscore: " + std::to_string(highscore));
+
 
         // *****RENDER EVERYTHING *****
             window.clear();
@@ -460,21 +491,20 @@ int main()
         // ***** DRAW HUD (STATIC ITEMS) *****
         window.setView(window.getDefaultView());  // Reset to default view (locks HUD)
 
-        window.draw(scoreText);  // Draw the time (score)
-        if (isMuted) window.draw(muteIcon);  // Draw mute icon
+        // Draw timer and score (updated earlier)
+        window.draw(timerText);   // Draw the time (top-left)
+        window.draw(scoreText);   // Draw the score (below the time)
+        window.draw(highscoreText);  // Draw the highscore
 
-        window.setView(view);  // camera follows player
 
-        /******* Display score on the screen *******/   
-        sf::Text scoreCounter; 
-        scoreCounter.setFont(font);
-        scoreCounter.setCharacterSize(24);
-        scoreCounter.setFillColor(sf::Color::Black);
-        scoreCounter.setString("Score: " + std::to_string(score)); // sets the score text 
-        //scoreCounter.setPosition(window.getSize().x - scoreCounter.getGlobalBounds().width - 12.0f, 2.0f); // sets the postion
-        window.draw(scoreCounter); // draws the score counter. 
+        if (isMuted) window.draw(muteIcon);  // Draw mute icon if muted
 
+        // Switch back to game view (for player/camera)
+        window.setView(view);
+
+        // Draw pause text (if paused)
         if (pause) window.draw(pausedText);
+
         window.display();
     }
 
