@@ -231,10 +231,11 @@ int main()
                     std::cout << "New Highscore! Time: " << hsMin << ":"
                         << (hsSec < 10 ? "0" : "") << hsSec << std::endl;
 
-                deathSound.play();
-                std::cout << "Game Over! (fell off screen)" << std::endl;
-                sf::sleep(sf::seconds(1.0f));
-                window.close();
+                    deathSound.play();
+                    std::cout << "Game Over! (fell off screen)" << std::endl;
+                    sf::sleep(sf::seconds(1.0f));
+                    window.close();
+                }
             }
             else
             {
