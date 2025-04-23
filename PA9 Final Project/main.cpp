@@ -208,6 +208,8 @@ int main()
         }
 
         // ***** UPDATE GAME STATE *****
+        // had to move it outside the loop inorder to get the bottom to work.
+        int score = 0;// initializing the score variable 
         if (!pause) {
             float deltaTime = clock.restart().asSeconds();
             elapsedTime = gameClock.getElapsedTime();
@@ -216,7 +218,6 @@ int main()
         player.update(deltaTime);
         
         /******* player score *******/
-        int score = 0;// initializing the score variable 
         PlayerScore(score, Enemies1, Enemies2, bullets);  // Update the score based on actions
 
 
