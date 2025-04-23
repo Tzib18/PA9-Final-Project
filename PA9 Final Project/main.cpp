@@ -464,10 +464,6 @@ int main()
 
         window.setView(view);  // camera follows player
 
-        window.draw(scoreText);
-        if (isMuted) window.draw(muteIcon);
-
-
         /******* Display score on the screen *******/   
         sf::Text scoreText; 
         scoreText.setFont(font);
