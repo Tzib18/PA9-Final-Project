@@ -63,11 +63,13 @@ int main()
         Platform(200.f, 100.f, &platformTexture)
     };
 
-    std::vector<MovingPlatform> movingPlatforms = {  // Moving platforms
+    std::vector<MovingPlatform> movingPlatforms = 
+    {  // Moving platforms
         MovingPlatform(250.f, 350.f, &movingPlatformTexture)
     };
 
-    std::vector<CrackedPlatform> crackedPlatforms = {  // Cracked platforms
+    std::vector<CrackedPlatform> crackedPlatforms =
+    {  // Cracked platforms
         CrackedPlatform(400.f, 250.f, &crackedPlatformTexture, &brokenPlatformTexture)
     };
 
@@ -215,6 +217,15 @@ int main()
                         << (hsSec < 10 ? "0" : "") << hsSec << std::endl;
                 }
             }
+            else
+            {
+                int hsMin = static_cast<int>(elapsedTime.asSeconds()) / 60;
+                int hsSec = static_cast<int>(elapsedTime.asSeconds()) % 60;
+
+                std::cout << "Score Time: " << hsMin << ":"
+                    << (hsSec < 10 ? "0" : "") << hsSec << std::endl;
+            }
+
             deathSound.play();
             std::cout << "Game Over! (fell off screen)" << std::endl;
             sf::sleep(sf::seconds(1.0f));
