@@ -20,7 +20,7 @@
 int main()
 {
     // ***** WINDOW AND MUSIC SETUP *****
-    sf::RenderWindow window(sf::VideoMode(800, 600), "Doodle Jump - PA9");
+    sf::RenderWindow window(sf::VideoMode(800, 600), "Malloc Jump (Inspired by Doodle Jump) - PA9");
     window.setFramerateLimit(60);
 
     SoundTrack musicPlayer;
@@ -63,11 +63,13 @@ int main()
         Platform(200.f, 100.f, &platformTexture)
     };
 
-    std::vector<MovingPlatform> movingPlatforms = {  // Moving platforms
+    std::vector<MovingPlatform> movingPlatforms = 
+    {  // Moving platforms
         MovingPlatform(250.f, 350.f, &movingPlatformTexture)
     };
 
-    std::vector<CrackedPlatform> crackedPlatforms = {  // Cracked platforms
+    std::vector<CrackedPlatform> crackedPlatforms =
+    {  // Cracked platforms
         CrackedPlatform(400.f, 250.f, &crackedPlatformTexture, &brokenPlatformTexture)
     };
 
@@ -161,18 +163,21 @@ int main()
                 {
                     bullets.emplace_back(&bulletTextureUp, playerCenterX, playerTopY, sf::Vector2f(0.f, -600.f));  // Upward velocity
                     bulletSound.play();
+                    player.startShooting();
                 }
                 // Shoot LEFT
                 else if (event.key.code == sf::Keyboard::Left)
                 {
                     bullets.emplace_back(&bulletTextureLeft, playerCenterX, playerTopY, sf::Vector2f(-600.f, 0.f));  // Leftward velocity
                     bulletSound.play();
+                    player.startShooting();
                 }
                 // Shoot RIGHT
                 else if (event.key.code == sf::Keyboard::Right)
                 {
                     bullets.emplace_back(&bulletTextureRight, playerCenterX, playerTopY, sf::Vector2f(600.f, 0.f));   // Rightward velocity
                     bulletSound.play();
+                    player.startShooting();
                 }
                 // Toggle mute on M key press
                 else if (event.key.code == sf::Keyboard::M)
@@ -209,43 +214,61 @@ int main()
             player.handleInput();
             player.update(deltaTime);
 
-            // ***** CHECK GAME OVER (PLAYER FALLS) *****
-            if (player.getPosition().y > view.getCenter().y + 300.f)
+        // ***** CHECK GAME OVER (PLAYER FALLS) *****
+        if (player.getPosition().y > view.getCenter().y + 300.f)
+        {
+            // Save new highscore if beaten
+            if (elapsedTime > highscoreTime) 
             {
-                // Save new highscore if beaten
-                if (elapsedTime > highscoreTime) {
-                    std::ofstream outFile("highscore.txt");
-                    if (outFile.is_open()) {
-                        int hsMin = static_cast<int>(elapsedTime.asSeconds()) / 60;
-                        int hsSec = static_cast<int>(elapsedTime.asSeconds()) % 60;
-                        outFile << hsMin << ":" << (hsSec < 10 ? "0" : "") << hsSec;
-                        outFile.close();
-                    }
-                }
+                std::ofstream outFile("highscore.txt");
+                if (outFile.is_open())
+                {
+                    int hsMin = static_cast<int>(elapsedTime.asSeconds()) / 60;
+                    int hsSec = static_cast<int>(elapsedTime.asSeconds()) % 60;
+                    outFile << hsMin << ":" << (hsSec < 10 ? "0" : "") << hsSec;
+                    outFile.close();
+
+                    std::cout << "New Highscore! Time: " << hsMin << ":"
+                        << (hsSec < 10 ? "0" : "") << hsSec << std::endl;
+
                 deathSound.play();
                 std::cout << "Game Over! (fell off screen)" << std::endl;
                 sf::sleep(sf::seconds(1.0f));
                 window.close();
             }
-
-            // ***** UPDATE CAMERA *****
-            if (player.getPosition().y < view.getCenter().y - 100.f)
+            else
             {
-                view.setCenter(view.getCenter().x, player.getPosition().y + 100.f);
-                window.setView(view);
+                int hsMin = static_cast<int>(elapsedTime.asSeconds()) / 60;
+                int hsSec = static_cast<int>(elapsedTime.asSeconds()) % 60;
+
+                std::cout << "Score Time: " << hsMin << ":"
+                    << (hsSec < 10 ? "0" : "") << hsSec << std::endl;
             }
 
-            // ***** SPAWN NEW BACKGROUNDS *****
-            float topOfView = view.getCenter().y - window.getSize().y / 2.f;
-            while (topOfView - window.getSize().y < highestBG)
-            {
-                sf::Sprite newBG(bgTexture);
-                newBG.setScale(bgScaleX, bgScaleY);
-                highestBG -= window.getSize().y;
-                newBG.setPosition(0.f, highestBG);
-                backgrounds.push_back(newBG);
-            }
+            deathSound.play();
+            std::cout << "Game Over! (fell off screen)" << std::endl;
+            sf::sleep(sf::seconds(1.0f));
+            window.close();
+        }
 
+        // ***** UPDATE CAMERA *****
+        if (player.getPosition().y < view.getCenter().y - 100.f)
+        {
+            view.setCenter(view.getCenter().x, player.getPosition().y + 100.f);
+            window.setView(view);
+        }
+
+        // ***** SPAWN NEW BACKGROUNDS *****
+        float topOfView = view.getCenter().y - window.getSize().y / 2.f;
+        while (topOfView - window.getSize().y < highestBG)
+        {
+            sf::Sprite newBG(bgTexture);
+            newBG.setScale(bgScaleX, bgScaleY);
+            highestBG -= window.getSize().y;
+            newBG.setPosition(0.f, highestBG);
+            backgrounds.push_back(newBG);
+        }
+          
             // ***** SPAWN NEW PLATFORMS AND ENEMIES *****
             while (highestPlatformY > view.getCenter().y - 300.f)
             {
@@ -414,8 +437,8 @@ int main()
         int seconds = static_cast<int>(elapsedTime.asSeconds()) % 60;
         scoreText.setString("Time: " + std::to_string(minutes) + ":" + (seconds < 10 ? "0" : "") + std::to_string(seconds));
 
-        // ***** RENDER EVERYTHING *****
-        window.clear();
+        // *****RENDER EVERYTHING *****
+            window.clear();
         for (auto& bg : backgrounds) window.draw(bg);
         for (auto& platform : platforms) window.draw(platform);
         for (auto& mp : movingPlatforms) window.draw(mp);
@@ -424,6 +447,15 @@ int main()
         for (auto& enemy : Enemies1) window.draw(enemy);
         for (auto& enemy : Enemies2) window.draw(enemy);
         window.draw(player);
+
+        // ***** DRAW HUD (STATIC ITEMS) *****
+        window.setView(window.getDefaultView());  // Reset to default view (locks HUD)
+
+        window.draw(scoreText);  // Draw the time (score)
+        if (isMuted) window.draw(muteIcon);  // Draw mute icon
+
+        window.setView(view);  // camera follows player
+
         window.draw(scoreText);
         if (isMuted) window.draw(muteIcon);
         if (pause) window.draw(pausedText);
