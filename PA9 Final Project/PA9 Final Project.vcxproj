@@ -157,6 +157,7 @@
     <ClInclude Include="Menu.hpp" />
     <ClInclude Include="MovingPlatform.hpp" />
     <ClInclude Include="Platform.hpp" />
+    <ClInclude Include="Player score.hpp" />
     <ClInclude Include="Player.hpp" />
   </ItemGroup>
   <ItemGroup>
