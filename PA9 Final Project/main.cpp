@@ -466,13 +466,13 @@ int main()
         window.setView(view);  // camera follows player
 
         /******* Display score on the screen *******/   
-        sf::Text scoreText; 
-        scoreText.setFont(font);
-        scoreText.setCharacterSize(24);
-        scoreText.setFillColor(sf::Color::Black);
-        scoreText.setPosition(20.f, 20.f);
-        scoreText.setString("Score: " + std::to_string(score));
-        window.draw(scoreText);
+        sf::Text scoreCounter; 
+        scoreCounter.setFont(font);
+        scoreCounter.setCharacterSize(24);
+        scoreCounter.setFillColor(sf::Color::Black);
+        scoreCounter.setString("Score: " + std::to_string(score)); // sets the score text 
+        //scoreCounter.setPosition(window.getSize().x - scoreCounter.getGlobalBounds().width - 12.0f, 2.0f); // sets the postion
+        window.draw(scoreCounter); // draws the score counter. 
 
         if (pause) window.draw(pausedText);
         window.display();
