@@ -24,7 +24,7 @@ Menu::Menu(sf::RenderWindow& window) : mWindow(window)
     mTitleText.setFont(mFont);
     mTitleText.setString("Malloc Jump!");
     mTitleText.setCharacterSize(48);
-    mTitleText.setFillColor(sf::Color::Red);
+    mTitleText.setFillColor(sf::Color::Black);
     mTitleText.setPosition(50.f, 100.f);
 
     /***** Play Text *****/
