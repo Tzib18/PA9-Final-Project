@@ -1,34 +1,48 @@
 
-// Player.cpp
 #include "Player.hpp"
 #include <iostream>
 
 // Constructor - loads the doodle sprite and sets initial position
-Player::Player() 
+Player::Player()
 {
-    if (!mTexture.loadFromFile("main_character.png")) 
+    // Load normal texture
+    if (!mNormalTexture.loadFromFile("main_character.png"))
     {
         std::cerr << "Error: Failed to load main_character.png" << std::endl;
     }
 
-    // Set texture to the sprite (sf::Sprite parent class)
-    this->setTexture(mTexture);
+    // Load shooting texture
+    if (!mShootingTexture.loadFromFile("main_character_shooting.png"))
+    {
+        std::cerr << "Error: Failed to load main_character_shooting.png" << std::endl;
+    }
 
-    // Set starting position in the window
+    // Set normal texture initially
+    this->setTexture(mNormalTexture);
+
+    // Starting position
     this->setPosition(400.f, 300.f);
 
-    // Scale down the player sprite to make it smaller
-    this->setScale(1.0f, 1.0f); // Feel free to Adjust scale as needed
+    // Scale the player sprite
+    this->setScale(1.0f, 1.0f);
 
-    // Initial vertical velocity (gravity effect)
+    // Initial vertical velocity
     mVelocityY = 0.f;
 }
 
-// Applies gravity and updates vertical movement
+// Applies gravity, updates vertical movement and handles texture switch
 void Player::update(float deltaTime)
 {
-    mVelocityY += mGravity;          // Apply gravity
-    this->move(0.f, mVelocityY);     // Move vertically
+    // Apply gravity
+    mVelocityY += mGravity;
+    this->move(0.f, mVelocityY);
+
+    // ***** Handle texture switching back to normal *****
+    if (mIsShooting && mShootTimer.getElapsedTime().asSeconds() > 0.2f)  // Show shooting texture for 0.2 seconds
+    {
+        this->setTexture(mNormalTexture);
+        mIsShooting = false;
+    }
 }
 
 // Handles left/right movement using A and D keys
@@ -73,4 +87,11 @@ float Player::getVelocityY() const
 sf::FloatRect Player::getBounds() const
 {
     return this->getGlobalBounds();
+}
+
+void Player::startShooting()
+{
+    this->setTexture(mShootingTexture);  // Switch to shooting texture
+    mIsShooting = true;
+    mShootTimer.restart();  // Start timer to track how long shooting texture is shown
 }

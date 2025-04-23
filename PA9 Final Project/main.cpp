@@ -21,7 +21,7 @@
 int main()
 {
     // ***** WINDOW AND MUSIC SETUP *****
-    sf::RenderWindow window(sf::VideoMode(800, 600), "Doodle Jump - PA9");
+    sf::RenderWindow window(sf::VideoMode(800, 600), "Malloc Jump (Inspired by Doodle Jump) - PA9");
     window.setFramerateLimit(60);
 
     SoundTrack musicPlayer;
@@ -64,11 +64,13 @@ int main()
         Platform(200.f, 100.f, &platformTexture)
     };
 
-    std::vector<MovingPlatform> movingPlatforms = {  // Moving platforms
+    std::vector<MovingPlatform> movingPlatforms = 
+    {  // Moving platforms
         MovingPlatform(250.f, 350.f, &movingPlatformTexture)
     };
 
-    std::vector<CrackedPlatform> crackedPlatforms = {  // Cracked platforms
+    std::vector<CrackedPlatform> crackedPlatforms =
+    {  // Cracked platforms
         CrackedPlatform(400.f, 250.f, &crackedPlatformTexture, &brokenPlatformTexture)
     };
 
@@ -134,6 +136,13 @@ int main()
         highscoreFile.close();
     }
 
+    /******Pause Menu Setup*****/
+    bool pause = false; // initial pause position is false
+    sf::Text pausedText("PAUSED", font, 50);
+    pausedText.setFillColor(sf::Color::Blue);
+    pausedText.setStyle(sf::Text::Bold);
+    pausedText.setPosition(view.getCenter().x - 100.f, view.getCenter().y - 50.f);
+
     // ***** MAIN GAME LOOP *****
     while (window.isOpen())
     {
@@ -155,18 +164,21 @@ int main()
                 {
                     bullets.emplace_back(&bulletTextureUp, playerCenterX, playerTopY, sf::Vector2f(0.f, -600.f));  // Upward velocity
                     bulletSound.play();
+                    player.startShooting();
                 }
                 // Shoot LEFT
                 else if (event.key.code == sf::Keyboard::Left)
                 {
                     bullets.emplace_back(&bulletTextureLeft, playerCenterX, playerTopY, sf::Vector2f(-600.f, 0.f));  // Leftward velocity
                     bulletSound.play();
+                    player.startShooting();
                 }
                 // Shoot RIGHT
                 else if (event.key.code == sf::Keyboard::Right)
                 {
                     bullets.emplace_back(&bulletTextureRight, playerCenterX, playerTopY, sf::Vector2f(600.f, 0.f));   // Rightward velocity
                     bulletSound.play();
+                    player.startShooting();
                 }
                 // Toggle mute on M key press
                 else if (event.key.code == sf::Keyboard::M)
@@ -185,12 +197,20 @@ int main()
 
                     std::cout << (isMuted ? "Muted." : "Unmuted.") << std::endl;
                 }
+                // Pause game when ESC is pressed
+                else if (event.key.code == sf::Keyboard::Escape)
+                {
+                    pause = !pause; // reverse pause position
+                    pause ? std::cout << "Paused" << std::endl : std::cout << "Resumed" << std::endl;
+                    pausedText.setPosition(view.getCenter().x - 100.f, view.getCenter().y - 50.f);
+                }
             }
         }
 
         // ***** UPDATE GAME STATE *****
-        float deltaTime = clock.restart().asSeconds();
-        elapsedTime = gameClock.getElapsedTime();
+        if (!pause) {
+            float deltaTime = clock.restart().asSeconds();
+            elapsedTime = gameClock.getElapsedTime();
 
         player.handleInput();
         player.update(deltaTime);
@@ -200,19 +220,39 @@ int main()
         PlayerScore(score, Enemies1, Enemies2, bullets);  // Update the score based on actions
 
 
+
         // ***** CHECK GAME OVER (PLAYER FALLS) *****
         if (player.getPosition().y > view.getCenter().y + 300.f)
         {
             // Save new highscore if beaten
-            if (elapsedTime > highscoreTime) {
+            if (elapsedTime > highscoreTime) 
+            {
                 std::ofstream outFile("highscore.txt");
-                if (outFile.is_open()) {
+                if (outFile.is_open())
+                {
                     int hsMin = static_cast<int>(elapsedTime.asSeconds()) / 60;
                     int hsSec = static_cast<int>(elapsedTime.asSeconds()) % 60;
                     outFile << hsMin << ":" << (hsSec < 10 ? "0" : "") << hsSec;
                     outFile.close();
+
+                    std::cout << "New Highscore! Time: " << hsMin << ":"
+                        << (hsSec < 10 ? "0" : "") << hsSec << std::endl;
+
+                    deathSound.play();
+                    std::cout << "Game Over! (fell off screen)" << std::endl;
+                    sf::sleep(sf::seconds(1.0f));
+                    window.close();
                 }
             }
+            else
+            {
+                int hsMin = static_cast<int>(elapsedTime.asSeconds()) / 60;
+                int hsSec = static_cast<int>(elapsedTime.asSeconds()) % 60;
+
+                std::cout << "Score Time: " << hsMin << ":"
+                    << (hsSec < 10 ? "0" : "") << hsSec << std::endl;
+            }
+
             deathSound.play();
             std::cout << "Game Over! (fell off screen)" << std::endl;
             sf::sleep(sf::seconds(1.0f));
@@ -236,175 +276,177 @@ int main()
             newBG.setPosition(0.f, highestBG);
             backgrounds.push_back(newBG);
         }
+          
+            // ***** SPAWN NEW PLATFORMS AND ENEMIES *****
+            while (highestPlatformY > view.getCenter().y - 300.f)
+            {
+                highestPlatformY -= static_cast<float>(rand() % 50 + 80);
+                float centerX = view.getCenter().x;
+                float x = static_cast<float>((rand() % 350) + (centerX - 180));
 
-        // ***** SPAWN NEW PLATFORMS AND ENEMIES *****
-        while (highestPlatformY > view.getCenter().y - 300.f)
-        {
-            highestPlatformY -= static_cast<float>(rand() % 50 + 80);
-            float centerX = view.getCenter().x;
-            float x = static_cast<float>((rand() % 350) + (centerX - 180));
-
-            // Randomly choose platform type
-            int platformType = rand() % 10;
-            if (platformType < 7)
-            {
-                platforms.emplace_back(x, highestPlatformY, &platformTexture);
-            }
-            else if (platformType < 9)
-            {
-                movingPlatforms.emplace_back(x, highestPlatformY, &movingPlatformTexture);
-            }
-            else
-            {
-                crackedPlatforms.emplace_back(x, highestPlatformY, &crackedPlatformTexture, &brokenPlatformTexture);
-            }
-
-            // Random enemy spawn
-            if ((rand() % 5) == 0)
-            {
-                if ((rand() % 2) == 0)
+                // Randomly choose platform type
+                int platformType = rand() % 10;
+                if (platformType < 7)
                 {
-                    Enemies1.emplace_back(&purpleGlobTexture, x + 10.f, highestPlatformY - 40.f);
-                    Enemies1.back().setScale(0.15f, 0.15f);
+                    platforms.emplace_back(x, highestPlatformY, &platformTexture);
                 }
-                else {
-                    Enemies2.emplace_back(&EnemiesTexture, x + 10.f, highestPlatformY - 40.f);
-                    Enemies2.back().setScale(0.5f, 0.5f);
-                }
-            }
-        }
-
-        // ***** HANDLE PLATFORM COLLISIONS *****
-        for (auto& mp : movingPlatforms)
-        {
-            mp.update(deltaTime);
-            if (player.getGlobalBounds().intersects(mp.getBounds()))
-            {
-                float playerBottom = player.getPosition().y + player.getGlobalBounds().height;
-                float platformTop = mp.getPosition().y;
-                if (player.getVelocityY() > 0 && playerBottom < platformTop + 10.f)
-                    player.jump();
-            }
-        }
-
-        for (auto& platform : platforms)
-        {
-            if (player.getGlobalBounds().intersects(platform.getBounds()))
-            {
-                float playerBottom = player.getPosition().y + player.getGlobalBounds().height;
-                float platformTop = platform.getPosition().y;
-                if (player.getVelocityY() > 0 && playerBottom < platformTop + 20.f)
-                    player.jump();
-            }
-        }
-
-        for (auto& cp : crackedPlatforms)
-        {
-            if (!cp.isBroken() && player.getGlobalBounds().intersects(cp.getBounds()))
-            {
-                float playerBottom = player.getPosition().y + player.getGlobalBounds().height;
-                float platformTop = cp.getPosition().y;
-                if (player.getVelocityY() > 0 && playerBottom < platformTop + 10.f)
+                else if (platformType < 9)
                 {
-                    player.jump();
-                    cp.breakPlatform();
+                    movingPlatforms.emplace_back(x, highestPlatformY, &movingPlatformTexture);
                 }
-            }
-        }
+                else
+                {
+                    crackedPlatforms.emplace_back(x, highestPlatformY, &crackedPlatformTexture, &brokenPlatformTexture);
+                }
 
-        // ***** UPDATE BULLETS *****
-        for (auto& bullet : bullets) bullet.update(deltaTime);
-
-        float screenTop = view.getCenter().y - window.getSize().y / 2.f;
-        bullets.erase(std::remove_if(bullets.begin(), bullets.end(),
-            [screenTop](const Bullet& b) { return b.isOffScreen(screenTop); }), bullets.end());
-
-        // ***** PLAYER COLLIDES WITH ENEMIES *****
-        for (auto& enemy : Enemies1)
-        {
-            if (player.getGlobalBounds().intersects(enemy.getGlobalBounds()))
-            {
-                // Save highscore if beaten
-                if (elapsedTime > highscoreTime) {
-                    std::ofstream outFile("highscore.txt");
-                    if (outFile.is_open()) {
-                        int hsMin = static_cast<int>(elapsedTime.asSeconds()) / 60;
-                        int hsSec = static_cast<int>(elapsedTime.asSeconds()) % 60;
-                        outFile << hsMin << ":" << (hsSec < 10 ? "0" : "") << hsSec;
-                        outFile.close();
+                // Random enemy spawn
+                if ((rand() % 5) == 0)
+                {
+                    if ((rand() % 2) == 0)
+                    {
+                        Enemies1.emplace_back(&purpleGlobTexture, x + 10.f, highestPlatformY - 40.f);
+                        Enemies1.back().setScale(0.15f, 0.15f);
+                    }
+                    else {
+                        Enemies2.emplace_back(&EnemiesTexture, x + 10.f, highestPlatformY - 40.f);
+                        Enemies2.back().setScale(0.5f, 0.5f);
                     }
                 }
-                deathSound.play();
-                std::cout << "Game Over! (hit enemy)" << std::endl;
-                sf::sleep(sf::seconds(1.0f));
-                window.close();
             }
-        }
-        for (auto& enemy : Enemies2)
-        {
-            if (player.getGlobalBounds().intersects(enemy.getGlobalBounds()))
+
+            // ***** HANDLE PLATFORM COLLISIONS *****
+            for (auto& mp : movingPlatforms)
             {
-                if (elapsedTime > highscoreTime) {
-                    std::ofstream outFile("highscore.txt");
-                    if (outFile.is_open()) {
-                        int hsMin = static_cast<int>(elapsedTime.asSeconds()) / 60;
-                        int hsSec = static_cast<int>(elapsedTime.asSeconds()) % 60;
-                        outFile << hsMin << ":" << (hsSec < 10 ? "0" : "") << hsSec;
-                        outFile.close();
+                mp.update(deltaTime);
+                if (player.getGlobalBounds().intersects(mp.getBounds()))
+                {
+                    float playerBottom = player.getPosition().y + player.getGlobalBounds().height;
+                    float platformTop = mp.getPosition().y;
+                    if (player.getVelocityY() > 0 && playerBottom < platformTop + 10.f)
+                        player.jump();
+                }
+            }
+
+            for (auto& platform : platforms)
+            {
+                if (player.getGlobalBounds().intersects(platform.getBounds()))
+                {
+                    float playerBottom = player.getPosition().y + player.getGlobalBounds().height;
+                    float platformTop = platform.getPosition().y;
+                    if (player.getVelocityY() > 0 && playerBottom < platformTop + 20.f)
+                        player.jump();
+                }
+            }
+
+            for (auto& cp : crackedPlatforms)
+            {
+                if (!cp.isBroken() && player.getGlobalBounds().intersects(cp.getBounds()))
+                {
+                    float playerBottom = player.getPosition().y + player.getGlobalBounds().height;
+                    float platformTop = cp.getPosition().y;
+                    if (player.getVelocityY() > 0 && playerBottom < platformTop + 10.f)
+                    {
+                        player.jump();
+                        cp.breakPlatform();
                     }
                 }
-                deathSound.play();
-                std::cout << "Game Over! (hit enemy)" << std::endl;
-                sf::sleep(sf::seconds(1.0f));
-                window.close();
             }
-        }
 
-        // ***** BULLETS COLLIDE WITH ENEMIES *****
-        for (auto bulletIt = bullets.begin(); bulletIt != bullets.end(); )
-        {
-            bool hit = false;
+            // ***** UPDATE BULLETS *****
+            for (auto& bullet : bullets) bullet.update(deltaTime);
 
-            for (auto enemyIt = Enemies1.begin(); enemyIt != Enemies1.end(); )
+            float screenTop = view.getCenter().y - window.getSize().y / 2.f;
+            bullets.erase(std::remove_if(bullets.begin(), bullets.end(),
+                [screenTop](const Bullet& b) { return b.isOffScreen(screenTop); }), bullets.end());
+
+            // ***** PLAYER COLLIDES WITH ENEMIES *****
+            for (auto& enemy : Enemies1)
             {
-                if (bulletIt->getGlobalBounds().intersects(enemyIt->getGlobalBounds()))
+                if (player.getGlobalBounds().intersects(enemy.getGlobalBounds()))
                 {
-                    globDeathSound.play();
-                    enemyIt = Enemies1.erase(enemyIt);
-                    hit = true;
-                    break;
+                    // Save highscore if beaten
+                    if (elapsedTime > highscoreTime) {
+                        std::ofstream outFile("highscore.txt");
+                        if (outFile.is_open()) {
+                            int hsMin = static_cast<int>(elapsedTime.asSeconds()) / 60;
+                            int hsSec = static_cast<int>(elapsedTime.asSeconds()) % 60;
+                            outFile << hsMin << ":" << (hsSec < 10 ? "0" : "") << hsSec;
+                            outFile.close();
+                        }
+                    }
+                    deathSound.play();
+                    std::cout << "Game Over! (hit enemy)" << std::endl;
+                    sf::sleep(sf::seconds(1.0f));
+                    window.close();
                 }
-                else ++enemyIt;
+            }
+            for (auto& enemy : Enemies2)
+            {
+                if (player.getGlobalBounds().intersects(enemy.getGlobalBounds()))
+                {
+                    if (elapsedTime > highscoreTime) {
+                        std::ofstream outFile("highscore.txt");
+                        if (outFile.is_open()) {
+                            int hsMin = static_cast<int>(elapsedTime.asSeconds()) / 60;
+                            int hsSec = static_cast<int>(elapsedTime.asSeconds()) % 60;
+                            outFile << hsMin << ":" << (hsSec < 10 ? "0" : "") << hsSec;
+                            outFile.close();
+                        }
+                    }
+                    deathSound.play();
+                    std::cout << "Game Over! (hit enemy)" << std::endl;
+                    sf::sleep(sf::seconds(1.0f));
+                    window.close();
+                }
             }
 
-            if (!hit)
+            // ***** BULLETS COLLIDE WITH ENEMIES *****
+            for (auto bulletIt = bullets.begin(); bulletIt != bullets.end(); )
             {
-                for (auto enemyIt = Enemies2.begin(); enemyIt != Enemies2.end(); )
+                bool hit = false;
+
+                for (auto enemyIt = Enemies1.begin(); enemyIt != Enemies1.end(); )
                 {
                     if (bulletIt->getGlobalBounds().intersects(enemyIt->getGlobalBounds()))
                     {
-                        enemy2DeathSound.play();
-                        enemyIt = Enemies2.erase(enemyIt);
+                        globDeathSound.play();
+                        enemyIt = Enemies1.erase(enemyIt);
                         hit = true;
                         break;
                     }
                     else ++enemyIt;
                 }
-            }
 
-            if (hit)
-                bulletIt = bullets.erase(bulletIt);
-            else
-                ++bulletIt;
+                if (!hit)
+                {
+                    for (auto enemyIt = Enemies2.begin(); enemyIt != Enemies2.end(); )
+                    {
+                        if (bulletIt->getGlobalBounds().intersects(enemyIt->getGlobalBounds()))
+                        {
+                            enemy2DeathSound.play();
+                            enemyIt = Enemies2.erase(enemyIt);
+                            hit = true;
+                            break;
+                        }
+                        else ++enemyIt;
+                    }
+                }
+
+                if (hit)
+                    bulletIt = bullets.erase(bulletIt);
+                else
+                    ++bulletIt;
+            }
         }
+        
 
         // ***** UPDATE SCORE DISPLAY *****
         int minutes = static_cast<int>(elapsedTime.asSeconds()) / 60;
         int seconds = static_cast<int>(elapsedTime.asSeconds()) % 60;
         scoreText.setString("Time: " + std::to_string(minutes) + ":" + (seconds < 10 ? "0" : "") + std::to_string(seconds));
 
-        // ***** RENDER EVERYTHING *****
-        window.clear();
+        // *****RENDER EVERYTHING *****
+            window.clear();
         for (auto& bg : backgrounds) window.draw(bg);
         for (auto& platform : platforms) window.draw(platform);
         for (auto& mp : movingPlatforms) window.draw(mp);
@@ -413,8 +455,18 @@ int main()
         for (auto& enemy : Enemies1) window.draw(enemy);
         for (auto& enemy : Enemies2) window.draw(enemy);
         window.draw(player);
+
+        // ***** DRAW HUD (STATIC ITEMS) *****
+        window.setView(window.getDefaultView());  // Reset to default view (locks HUD)
+
+        window.draw(scoreText);  // Draw the time (score)
+        if (isMuted) window.draw(muteIcon);  // Draw mute icon
+
+        window.setView(view);  // camera follows player
+
         window.draw(scoreText);
         if (isMuted) window.draw(muteIcon);
+
 
         /******* Display score on the screen *******/   
         sf::Text scoreText; 
@@ -425,7 +477,7 @@ int main()
         scoreText.setString("Score: " + std::to_string(score));
         window.draw(scoreText);
 
-
+        if (pause) window.draw(pausedText);
         window.display();
     }
 
