@@ -288,7 +288,7 @@ int main()
             }
 
             deathSound.play();
-            std::cout << "Game Over! (fell off screen)" << std::endl;
+            std::cout << "aint no way...!" << std::endl;
             sf::sleep(sf::seconds(1.0f));
             window.close();
         }
@@ -416,7 +416,7 @@ int main()
                     }
 
                     deathSound.play();
-                    std::cout << "Game Over! (hit enemy)" << std::endl;
+                    std::cout << "Yah I don't you're supposed to hit those" << std::endl;
                     sf::sleep(sf::seconds(1.0f));
                     window.close();
                 }
@@ -442,7 +442,7 @@ int main()
                     }
 
                     deathSound.play();
-                    std::cout << "Game Over! (hit enemy)" << std::endl;
+                    std::cout << "Are you serious :/" << std::endl;
                     sf::sleep(sf::seconds(1.0f));
                     window.close();
                 }
