@@ -148,6 +148,7 @@
     <ClCompile Include="Platform.cpp" />
     <ClCompile Include="player score.cpp" />
     <ClCompile Include="Player.cpp" />
+    <ClCompile Include="Test.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BackgroundAudioTrack.hpp" />
@@ -159,6 +160,7 @@
     <ClInclude Include="Platform.hpp" />
     <ClInclude Include="Player score.hpp" />
     <ClInclude Include="Player.hpp" />
+    <ClInclude Include="Test.hpp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="highscore.txt" />

@@ -17,6 +17,28 @@
 #include "Enemy.hpp"
 #include "Bullet.hpp"
 #include "Player score.hpp"
+#include "Test.hpp"
+
+// function to run the tests:
+void runTests()
+{
+    Tests tests;
+
+    if (tests.testPlayerInitialPosition()) std::cout << "Test 1 Passed: Player initial position.\n";
+    else std::cout << "Test 1 Failed." << std::endl;
+
+    if (tests.testBulletMovement()) std::cout << "Test 2 Passed: Bullet movement.\n";
+    else std::cout << "Test 2 Failed." << std::endl;
+
+    if (tests.testPlayerPlatformCollision()) std::cout << "Test 3 Passed: Player-platform collision.\n";
+    else std::cout << "Test 3 Failed." << std::endl;
+
+    if (tests.testPlayerEnemyCollision()) std::cout << "Test 4 Passed: Player-enemy collision.\n";
+    else std::cout << "Test 4 Failed." << std::endl;
+
+    if (tests.testScoreIncreaseOnEnemyKill()) std::cout << "Test 5 Passed: Score increase on enemy kill.\n";
+    else std::cout << "Test 5 Failed." << std::endl;
+}
 
 int main()
 {
@@ -507,6 +529,9 @@ int main()
 
         window.display();
     }
+
+    /***** Run Tests *****/
+    runTests();
 
     return 0;
 }
