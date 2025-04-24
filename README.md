@@ -1,3 +1,9 @@
+/****************************************************************************************
+* Name: Austin tzib, Amber Conroy, Trent Gamiao, Nour Elsahati                          *
+* Lab section: Austin Tzib, Amber Conroy, Trent Gamiao - lab 6,mNour Elsahati - lab 9   *
+* Date: 4/24/25                                                                         *                                                      
+*****************************************************************************************/
+
 --->Malloc Jump (Inspired by Doodle Jump)<---
 
 **Malloc Jump** is a vertical platformer game inspired by **Doodle Jump**. The objective of the game is to climb as high as possible 
